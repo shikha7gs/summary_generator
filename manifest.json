@@ -1,0 +1,27 @@
+{
+    "name": "Page Summarizer",
+    "description": "Generate Summary for web page",
+    "version": "1.0",
+    "manifest_version": 3,
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "img/icon.png"
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "scripts/content.js"
+            ],
+            "matches": [
+                "https://developer.chrome.com/docs/extensions/*",
+                "https://developer.chrome.com/docs/webstore/*"
+            ]
+        }
+    ],
+    "icons":{
+        "16":"img/icon_16.png",
+        "32":"img/icon_32.png",
+        "48":"img/icon_48.png",
+        "128":"img/icon_128.png"
+    }
+}
