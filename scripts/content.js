@@ -69,37 +69,63 @@ button.addEventListener('mouseout', function () {
 })
 document.querySelector("body").insertAdjacentElement('afterbegin', button)
 
+function getVisibleTextAfterStability(callback, delay = 1000) {
+  let timeout;
+
+  const observer = new MutationObserver(() => { //record any changes in DOM
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      observer.disconnect()
+      const range = document.createRange();
+      range.selectNodeContents(document.body);
+
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      const visibleText = selection.toString();
+      selection.removeAllRanges();
+
+      callback(visibleText);
+    }, delay);
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+}
 
 try {
-  window.onload = function () {
-    let text = body?.textContent?.split('\n').map(line => line.trim()).filter(line => line.length > 0).join(' ');
-    console.log(text)
-    fetch('https://api.openai.com/v1/chat/completions', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer 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`,
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "You are an AI which rtake input as text conent of a webpage then output summary under 250 characters."
-          },
-          {
-            role: "user",
-            content: text,
-          },
-        ],
-      }),
-    }).then((res) => res.json()).then((data) => {
-      summaryDiv.innerText = data.choices[0].message.content
-      button.innerHTML = readySvg
-    }).catch((e) => {
-      throw new Error("Something went wrong");
-    })
-  };
+  if (body) {
+    getVisibleTextAfterStability((visibleText) => {
+      const text = visibleText?.split('\n').map(line => line.trim()).filter(line => line.length > 0).join(' ');
+      console.log(text)
+      fetch('https://api.openai.com/v1/chat/completions', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer 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`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content: "You are an AI which rtake input as text conent of a webpage then output summary under 250 characters."
+            },
+            {
+              role: "user",
+              content: text,
+            },
+          ],
+        }),
+      }).then((res) => res.json()).then((data) => {
+        summaryDiv.innerText = data.choices[0].message.content
+        button.innerHTML = readySvg
+      }).catch((e) => {
+        throw new Error("Something went wrong");
+      })
+    }, 1000);
+  }
 } catch (error) {
   summaryDiv.innerText = "Something Went Wrong!"
   button.innerHTML = "❌"
