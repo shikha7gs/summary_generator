@@ -103,7 +103,7 @@ try {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer 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`,
+          Authorization: `Bearer ${APIKEY}`,
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
